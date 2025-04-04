@@ -1,0 +1,36 @@
+//Write a program to implement ls –li command which list the files in a specified directory. Your program should Print 5 attributes of files.
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <time.h>
+
+int main(int argc, char *argv[]) {
+    struct dirent *dir;
+    struct stat mystat;
+    DIR *dp;
+
+    dp = opendir("."); // Open the current directory
+    if (dp) {
+        while ((dir = readdir(dp)) != NULL) { // Read files in directory
+            stat(dir->d_name, &mystat); // Get file statistics
+
+            // Print inode, mode, UID, GID, last access time, and filename
+            printf("%6ld %6o %d %d %s %s\n",
+                   mystat.st_ino, // Inode number
+                   mystat.st_mode, // File mode (permissions)
+                   mystat.st_uid, // User ID of owner
+                   mystat.st_gid, // Group ID of owner
+                   ctime(&mystat.st_atime), // Last access time
+                   dir->d_name); // File name
+        }
+        closedir(dp); // Close directory
+    } else {
+        perror("Error opening directory");
+        return EXIT_FAILURE;
+    }
+
+    return 0;
+}
