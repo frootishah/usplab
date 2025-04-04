@@ -1,0 +1,49 @@
+//Program to demonstrate the creation of hard links and the various properties of hard links
+
+#include <stdio.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <errno.h>
+
+int main(int argc, char *argv[]) {
+    if (argc != 4) {
+        printf("Usage:\n");
+        printf("  %s -h <source_file> <hard_link>\n", argv[0]);
+        printf("  %s -s <source_file> <soft_link>\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    if (strcmp(argv[1], "-h") == 0) {
+        printf("Creating hard link between %s and %s\n", argv[2], argv[3]);
+
+        if (link(argv[2], argv[3]) == 0)
+            printf("Hard link created successfully\n");
+        else {
+            perror("Error creating hard link");
+            return EXIT_FAILURE;
+        }
+    } 
+    else if (strcmp(argv[1], "-s") == 0) {
+        printf("Creating soft link between %s and %s\n", argv[2], argv[3]);
+
+        if (symlink(argv[2], argv[3]) == 0)
+            printf("Soft link created successfully\n");
+        else {
+            perror("Error creating soft link");
+            return EXIT_FAILURE;
+        }
+    } 
+    else {
+        printf("Invalid option: %s\n", argv[1]);
+        printf("Usage:\n");
+        printf("  %s -h <source_file> <hard_link>\n", argv[0]);
+        printf("  %s -s <source_file> <soft_link>\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
