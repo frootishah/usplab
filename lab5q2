@@ -1,0 +1,30 @@
+/*Write a C program to create a child process and child should perform addition of two numbers and parent process to perform product of two numbers.*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main() 
+{
+    pid_t pid;
+    int num1 = 5, num2 = 3;
+    
+    pid = fork(); // Create a child process
+    
+    if (pid < 0) {
+        perror("Fork failed");
+        return 1;
+    }
+    
+    if (pid == 0) { // Child process
+        int sum = num1 + num2;
+        printf("Child Process: Sum of %d and %d is %d\n", num1, num2, sum);
+    } else { // Parent process
+        wait(NULL); // Wait for the child to finish
+        int product = num1 * num2;
+        printf("Parent Process: Product of %d and %d is %d\n", num1, num2, product);
+    }
+    
+    return 0;
+}
