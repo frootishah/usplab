@@ -1,0 +1,86 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+int main() 
+{
+    pid_t pid;
+    int status;
+
+    // Create a child process
+    pid = fork();
+
+    if (pid < 0) {
+        // Fork failed
+        perror("Fork failed");
+        exit(1);
+    }
+
+    if (pid == 0) 
+
+   {
+        // This is the child process
+        printf("Child process: PID = %d, Parent PID = %d\n", getpid(), getppid());
+        // Simulate some work in the child process
+        sleep(2);
+        printf("Child process exiting...\n");
+        exit(0);
+    } 
+else 
+{
+        // This is the parent process
+        printf("Parent process: PID = %d, waiting for child to finish...\n", getpid());
+        
+        // Using wait() to wait for any child process to finish
+        pid_t child_pid = wait(&status); // Wait for any child process
+        
+        if (child_pid == -1) {
+            perror("wait failed");
+            exit(1);
+ }
+        
+        if (WIFEXITED(status)) {
+            printf("Child with PID %d exited with status %d\n", child_pid, WEXITSTATUS(status));
+        } else {
+            printf("Child with PID %d did not exit normally\n", child_pid);
+        }
+
+        // Create another child process to demonstrate waitpid()
+        pid_t pid2 = fork();
+        
+        if (pid2 < 0) {
+            // Fork failed
+            perror("Fork failed");
+            exit(1);
+        }
+
+        if (pid2 == 0) {
+            // This is the second child process
+            printf("Second child process: PID = %d, Parent PID = %d\n", getpid(), getppid());
+            sleep(2);
+            printf("Second child process exiting...\n");
+            exit(0);
+        } else {
+            // This is the parent process again
+            printf("Parent process: PID = %d, waiting for second child with waitpid...\n", getpid());
+
+            // Using waitpid() to wait for the second child to finish
+            pid_t second_child_pid = waitpid(pid2, &status, 0);
+            
+            if (second_child_pid == -1) {
+                perror("waitpid failed");
+                exit(1);
+            }
+
+            if (WIFEXITED(status)) {
+                printf("Second child with PID %d exited with status %d\n", second_child_pid, WEXITSTATUS(status));
+            } else {
+                printf("Second child with PID %d did not exit normally\n", second_child_pid);
+            }
+        }
+    }
+
+    return 0;
+}
